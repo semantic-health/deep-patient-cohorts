@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "deep_patient_cohorts"
+version = "0.1.0"
+description = "A deep learning NLP library for creating patient cohorts from unstructured clinical data."
+authors = ["johngiorgi <johnmgiorgi@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/semantic-health/deep-patient-cohorts"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pandas = "^1.1.1"
+spacy = "^2.3.2"
+en-core-sci-sm = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_sm-0.2.5.tar.gz"}
+scispacy = "^0.2.5"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+flake8 = "^3.8.3"
+hypothesis = "^5.23.7"
+pytest = "^6.0.0"
+pytest-cov = "^2.10.0"
+coverage = "^5.2.1"
+codecov = "^2.1.8"
+
+[tool.black]
+line-length = 100
+
+include = '\.pyi?$'
+
+exclude = '''
+(
+      __pycache__
+    | \btutorials\b
+    | \bbuild\b
+    | \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.vscode
+    | \.venv
+    | \bdist\b
+    | \bdoc\b
+)
+'''
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
