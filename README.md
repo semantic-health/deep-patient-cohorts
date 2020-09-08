@@ -1,4 +1,5 @@
 ![build](https://github.com/semantic-health/deep-patient-cohorts/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/semantic-health/deep-patient-cohorts/branch/master/graph/badge.svg)](https://codecov.io/gh/semantic-health/deep-patient-cohorts)
 ![GitHub](https://img.shields.io/github/license/semantic-health/deep-patient-cohorts?color=blue)
 
 # Deep Patient Cohorts
