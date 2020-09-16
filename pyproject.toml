@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/semantic-health/deep-patient-cohorts"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 pandas = "^1.1.1"
 spacy = "^2.3.2"
 en-core-sci-sm = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_sm-0.2.5.tar.gz"}
@@ -22,6 +22,8 @@ pytest = "^6.0.0"
 pytest-cov = "^2.10.0"
 coverage = "^5.2.1"
 codecov = "^2.1.8"
+ipykernel = "^5.3.4"
+jupyterlab = "^2.2.8"
 
 [tool.black]
 line-length = 100
