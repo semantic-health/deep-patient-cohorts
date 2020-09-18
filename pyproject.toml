@@ -15,7 +15,7 @@ en-core-sci-sm = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/rele
 scispacy = "^0.2.5"
 
 [tool.poetry.dev-dependencies]
-black = "^19.10b0"
+black = "^20.8b1"
 flake8 = "^3.8.3"
 hypothesis = "^5.23.7"
 pytest = "^6.0.0"
