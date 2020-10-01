@@ -16,6 +16,7 @@ en-core-sci-sm = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/rel
 scispacy = "^0.2.5"
 keras-tuner = {git = "https://github.com/keras-team/keras-tuner.git", rev = "1.0.2rc2"}
 autokeras = "^1.0.9"
+scikit-multilearn = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
@@ -27,6 +28,7 @@ coverage = "^5.2.1"
 codecov = "^2.1.8"
 ipykernel = "^5.3.4"
 jupyterlab = "^2.2.8"
+jupyter_nbextensions_configurator = "^0.4.1"
 
 [tool.black]
 line-length = 100

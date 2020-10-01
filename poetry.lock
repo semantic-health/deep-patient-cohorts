@@ -373,7 +373,6 @@ spacy = ">=2.3.0"
 reference = ""
 type = "url"
 url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_sm-0.2.5.tar.gz"
-
 [[package]]
 category = "dev"
 description = "Discover and load entry points from installed packages."
@@ -448,6 +447,10 @@ pytz = "*"
 requests = ">=2.18.0,<3.0.0dev"
 setuptools = ">=34.0.0"
 six = ">=1.10.0"
+
+[package.dependencies.grpcio]
+optional = true
+version = ">=1.29.0,<2.0dev"
 
 [package.extras]
 grpc = ["grpcio (>=1.29.0,<2.0dev)"]
@@ -525,22 +528,27 @@ category = "main"
 description = "Google BigQuery API client library"
 name = "google-cloud-bigquery"
 optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-version = "1.28.0"
+python-versions = ">=3.6"
+version = "2.0.0"
 
 [package.dependencies]
-google-api-core = ">=1.21.0,<2.0dev"
 google-cloud-core = ">=1.4.1,<2.0dev"
 google-resumable-media = ">=0.6.0,<2.0dev"
+libcst = ">=0.2.5"
+proto-plus = ">=1.10.0"
 six = ">=1.13.0,<2.0.0dev"
 
+[package.dependencies.google-api-core]
+extras = ["grpc"]
+version = ">=1.22.2,<2.0.0dev"
+
 [package.extras]
-all = ["google-cloud-bigquery-storage (>=1.0.0,<2.0.0dev)", "grpcio (>=1.32.0,<2.0dev)", "pyarrow (>=1.0.0,<2.0dev)", "pandas (>=0.23.0)", "tqdm (>=4.7.4,<5.0.0dev)", "opentelemetry-api (0.9b0)", "opentelemetry-sdk (0.9b0)", "opentelemetry-instrumentation (0.9b0)", "pyarrow (>=0.16.0,<0.17.0dev)", "pyarrow (>=1.0.0,<2.0de)"]
-bqstorage = ["google-cloud-bigquery-storage (>=1.0.0,<2.0.0dev)", "grpcio (>=1.32.0,<2.0dev)", "pyarrow (>=1.0.0,<2.0dev)"]
-fastparquet = ["fastparquet", "python-snappy", "llvmlite (<=0.31.0)", "llvmlite (<=0.34.0)"]
+all = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.32.0,<2.0dev)", "pyarrow (>=1.0.0,<2.0dev)", "pandas (>=0.23.0)", "tqdm (>=4.7.4,<5.0.0dev)", "opentelemetry-api (0.9b0)", "opentelemetry-sdk (0.9b0)", "opentelemetry-instrumentation (0.9b0)"]
+bqstorage = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.32.0,<2.0dev)", "pyarrow (>=1.0.0,<2.0dev)"]
+fastparquet = ["fastparquet", "python-snappy", "llvmlite (>=0.34.0)"]
 opentelemetry = ["opentelemetry-api (0.9b0)", "opentelemetry-sdk (0.9b0)", "opentelemetry-instrumentation (0.9b0)"]
 pandas = ["pandas (>=0.23.0)"]
-pyarrow = ["pyarrow (>=0.16.0,<0.17.0dev)", "pyarrow (>=1.0.0,<2.0de)"]
+pyarrow = ["pyarrow (>=1.0.0,<2.0dev)"]
 tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
 
 [[package]]
@@ -866,6 +874,24 @@ test = ["ipykernel", "ipython", "mock", "pytest", "pytest-asyncio", "async-gener
 
 [[package]]
 category = "dev"
+description = "Common utilities for jupyter-contrib projects."
+name = "jupyter-contrib-core"
+optional = false
+python-versions = "*"
+version = "0.3.3"
+
+[package.dependencies]
+jupyter-core = "*"
+notebook = ">=4.0"
+setuptools = "*"
+tornado = "*"
+traitlets = "*"
+
+[package.extras]
+testing_utils = ["nose", "mock"]
+
+[[package]]
+category = "dev"
 description = "Jupyter core package. A base package on which Jupyter projects rely."
 name = "jupyter-core"
 optional = false
@@ -875,6 +901,25 @@ version = "4.6.3"
 [package.dependencies]
 pywin32 = ">=1.0"
 traitlets = "*"
+
+[[package]]
+category = "dev"
+description = "jupyter serverextension providing configuration interfaces for nbextensions."
+name = "jupyter-nbextensions-configurator"
+optional = false
+python-versions = "*"
+version = "0.4.1"
+
+[package.dependencies]
+jupyter_contrib_core = ">=0.3.3"
+jupyter_core = "*"
+notebook = ">=4.0"
+pyyaml = "*"
+tornado = "*"
+traitlets = "*"
+
+[package.extras]
+test = ["jupyter-contrib-core", "nose", "requests", "selenium", "mock"]
 
 [[package]]
 category = "dev"
@@ -983,7 +1028,6 @@ tests = ["pytest", "flake8", "mock", "portpicker", "pytest-xdist", "pytest-cov"]
 reference = "8f0d4550417af1676143499c688434065eb807c9"
 type = "git"
 url = "https://github.com/keras-team/keras-tuner.git"
-
 [[package]]
 category = "main"
 description = "A fast implementation of the Cassowary constraint solver"
@@ -991,6 +1035,26 @@ name = "kiwisolver"
 optional = false
 python-versions = ">=3.6"
 version = "1.2.0"
+
+[[package]]
+category = "main"
+description = "A concrete syntax tree with AST-like properties for Python 3.5, 3.6, 3.7 and 3.8 programs."
+name = "libcst"
+optional = false
+python-versions = ">=3.6"
+version = "0.3.11"
+
+[package.dependencies]
+pyyaml = ">=5.2"
+typing-extensions = ">=3.7.4.2"
+typing-inspect = ">=0.4.0"
+
+[package.dependencies.dataclasses]
+python = "<3.7"
+version = ">=0.6.0"
+
+[package.extras]
+dev = ["black (>=19.10b0)", "codecov (>=2.1.4)", "coverage (>=4.5.4)", "fixit (>=0.1.0)", "flake8 (>=3.7.8)", "hypothesis (>=4.36.0)", "hypothesmith (>=0.0.4)", "isort (>=4.3.20)", "jupyter (>=1.0.0)", "nbsphinx (>=0.4.2)", "pyre-check (0.0.41)", "sphinx-rtd-theme (>=0.4.3)", "prompt-toolkit (>=2.0.9)", "tox (>=3.18.1)"]
 
 [[package]]
 category = "main"
@@ -1067,7 +1131,7 @@ python-versions = "*"
 version = "1.0.2"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
 name = "mypy-extensions"
 optional = false
@@ -1390,6 +1454,20 @@ wcwidth = "*"
 
 [[package]]
 category = "main"
+description = "Beautiful, Pythonic protocol buffers."
+name = "proto-plus"
+optional = false
+python-versions = "*"
+version = "1.10.0"
+
+[package.dependencies]
+protobuf = ">=3.12.0"
+
+[package.extras]
+testing = ["google-api-core (>=1.22.2)"]
+
+[[package]]
+category = "main"
 description = "Protocol Buffers"
 name = "protobuf"
 optional = false
@@ -1682,6 +1760,14 @@ threadpoolctl = ">=2.0.0"
 
 [package.extras]
 alldeps = ["numpy (>=1.13.3)", "scipy (>=0.19.1)"]
+
+[[package]]
+category = "main"
+description = "Scikit-multilearn is a BSD-licensed library for multi-label classification that is built on top of the well-known scikit-learn ecosystem."
+name = "scikit-multilearn"
+optional = false
+python-versions = "*"
+version = "0.2.0"
 
 [[package]]
 category = "main"
@@ -2180,6 +2266,18 @@ version = "3.7.4.3"
 
 [[package]]
 category = "main"
+description = "Runtime inspection utilities for typing module."
+name = "typing-inspect"
+optional = false
+python-versions = "*"
+version = "0.6.0"
+
+[package.dependencies]
+mypy-extensions = ">=0.3.0"
+typing-extensions = ">=3.7.4"
+
+[[package]]
+category = "main"
 description = "URI templates"
 name = "uritemplate"
 optional = false
@@ -2285,7 +2383,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "5e0cd5fc423d513a4bd892988c8955181de603e776fe30520a62c865e5ccbeb2"
+content-hash = "443b01eef300a9a950c1610a695ffbbc7931c5c9fae3795ac247403c3f3a7b44"
 lock-version = "1.0"
 python-versions = "^3.6.1"
 
@@ -2616,8 +2714,8 @@ google-auth-oauthlib = [
     {file = "google_auth_oauthlib-0.4.1-py2.py3-none-any.whl", hash = "sha256:a92a0f6f41a0fb6138454fbc02674e64f89d82a244ea32f98471733c8ef0e0e1"},
 ]
 google-cloud-bigquery = [
-    {file = "google-cloud-bigquery-1.28.0.tar.gz", hash = "sha256:9784cff71d6a46ce202748169f9c7e38fc99d6babbb2f3cdc540475d11f572b9"},
-    {file = "google_cloud_bigquery-1.28.0-py2.py3-none-any.whl", hash = "sha256:9266e989531f290d3b836dc7b308ac22b350c4d664af19325bd0102261231b71"},
+    {file = "google-cloud-bigquery-2.0.0.tar.gz", hash = "sha256:28449800e502b8d4f70ba8d338f6abac1495000005a6c89632687f6847ee03cf"},
+    {file = "google_cloud_bigquery-2.0.0-py2.py3-none-any.whl", hash = "sha256:d008b8640a53bec2d10f0459b4f9f0472b68c28525c3056eb0353ca74299adb9"},
 ]
 google-cloud-core = [
     {file = "google-cloud-core-1.4.1.tar.gz", hash = "sha256:613e56f164b6bee487dd34f606083a0130f66f42f7b10f99730afdf1630df507"},
@@ -2787,9 +2885,16 @@ jupyter-client = [
     {file = "jupyter_client-6.1.7-py3-none-any.whl", hash = "sha256:c958d24d6eacb975c1acebb68ac9077da61b5f5c040f22f6849928ad7393b950"},
     {file = "jupyter_client-6.1.7.tar.gz", hash = "sha256:49e390b36fe4b4226724704ea28d9fb903f1a3601b6882ce3105221cd09377a1"},
 ]
+jupyter-contrib-core = [
+    {file = "jupyter_contrib_core-0.3.3-py2.py3-none-any.whl", hash = "sha256:1ec81e275a8f5858d56b0c4c6cd85335aa8e915001b8657fe51c620c3cdde50f"},
+    {file = "jupyter_contrib_core-0.3.3.tar.gz", hash = "sha256:e65bc0e932ff31801003cef160a4665f2812efe26a53801925a634735e9a5794"},
+]
 jupyter-core = [
     {file = "jupyter_core-4.6.3-py2.py3-none-any.whl", hash = "sha256:a4ee613c060fe5697d913416fc9d553599c05e4492d58fac1192c9a6844abb21"},
     {file = "jupyter_core-4.6.3.tar.gz", hash = "sha256:394fd5dd787e7c8861741880bdf8a00ce39f95de5d18e579c74b882522219e7e"},
+]
+jupyter-nbextensions-configurator = [
+    {file = "jupyter_nbextensions_configurator-0.4.1.tar.gz", hash = "sha256:e5e86b5d9d898e1ffb30ebb08e4ad8696999f798fef3ff3262d7b999076e4e83"},
 ]
 jupyterlab = [
     {file = "jupyterlab-2.2.8-py3-none-any.whl", hash = "sha256:95d0509557881cfa8a5fcdf225f2fca46faf1bc52fc56a28e0b72fcc594c90ab"},
@@ -2831,6 +2936,10 @@ kiwisolver = [
     {file = "kiwisolver-1.2.0-cp38-none-win32.whl", hash = "sha256:d069ef4b20b1e6b19f790d00097a5d5d2c50871b66d10075dab78938dc2ee2cf"},
     {file = "kiwisolver-1.2.0-cp38-none-win_amd64.whl", hash = "sha256:18d749f3e56c0480dccd1714230da0f328e6e4accf188dd4e6884bdd06bf02dd"},
     {file = "kiwisolver-1.2.0.tar.gz", hash = "sha256:247800260cd38160c362d211dcaf4ed0f7816afb5efe56544748b21d6ad6d17f"},
+]
+libcst = [
+    {file = "libcst-0.3.11-py3-none-any.whl", hash = "sha256:15477d0b60a0da2929e0dc005b321e5113337dc16f4f42b26d8388955c5599b3"},
+    {file = "libcst-0.3.11.tar.gz", hash = "sha256:bbc9ef10f9d263f8a99f8a84ea0408b8d26b58236cb581016485e3658ffa1b24"},
 ]
 markdown = [
     {file = "Markdown-3.2.2-py3-none-any.whl", hash = "sha256:c467cd6233885534bf0fe96e62e3cf46cfc1605112356c4f9981512b8174de59"},
@@ -3120,6 +3229,9 @@ prompt-toolkit = [
     {file = "prompt_toolkit-3.0.7-py3-none-any.whl", hash = "sha256:83074ee28ad4ba6af190593d4d4c607ff525272a504eb159199b6dd9f950c950"},
     {file = "prompt_toolkit-3.0.7.tar.gz", hash = "sha256:822f4605f28f7d2ba6b0b09a31e25e140871e96364d1d377667b547bb3bf4489"},
 ]
+proto-plus = [
+    {file = "proto-plus-1.10.0.tar.gz", hash = "sha256:899f2bdc081197e683e3e29d05cd75861efbdd3de883bfb8b78165d74fb587f1"},
+]
 protobuf = [
     {file = "protobuf-3.13.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:9c2e63c1743cba12737169c447374fab3dfeb18111a460a8c1a000e35836b18c"},
     {file = "protobuf-3.13.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:1e834076dfef9e585815757a2c7e4560c7ccc5962b9d09f831214c693a91b463"},
@@ -3363,6 +3475,11 @@ scikit-learn = [
     {file = "scikit_learn-0.23.2-cp38-cp38-win32.whl", hash = "sha256:0d39748e7c9669ba648acf40fb3ce96b8a07b240db6888563a7cb76e05e0d9cc"},
     {file = "scikit_learn-0.23.2-cp38-cp38-win_amd64.whl", hash = "sha256:1b8a391de95f6285a2f9adffb7db0892718950954b7149a70c783dc848f104ea"},
 ]
+scikit-multilearn = [
+    {file = "scikit-multilearn-0.2.0.linux-x86_64.tar.gz", hash = "sha256:3179fed29b1492f6a69600696c23045b9f494d2b89d1796a8bdc43ccbb33712b"},
+    {file = "scikit_multilearn-0.2.0-py2-none-any.whl", hash = "sha256:0a389600a6797db6567f2f6ca1d0dca30bebfaaa73f75de62d7ae40f8f03d4fb"},
+    {file = "scikit_multilearn-0.2.0-py3-none-any.whl", hash = "sha256:068c652f22704a084ca252d05d21a655e7c9b248d0a4543847b74de5fca2b3f0"},
+]
 scipy = [
     {file = "scipy-1.5.2-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:cca9fce15109a36a0a9f9cfc64f870f1c140cb235ddf27fe0328e6afb44dfed0"},
     {file = "scipy-1.5.2-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:1c7564a4810c1cd77fcdee7fa726d7d39d4e2695ad252d7c86c3ea9d85b7fb8f"},
@@ -3600,6 +3717,11 @@ typing-extensions = [
     {file = "typing_extensions-3.7.4.3-py2-none-any.whl", hash = "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"},
     {file = "typing_extensions-3.7.4.3-py3-none-any.whl", hash = "sha256:7cb407020f00f7bfc3cb3e7881628838e69d8f3fcab2f64742a5e76b2f841918"},
     {file = "typing_extensions-3.7.4.3.tar.gz", hash = "sha256:99d4073b617d30288f569d3f13d2bd7548c3a7e4c8de87db09a9d29bb3a4a60c"},
+]
+typing-inspect = [
+    {file = "typing_inspect-0.6.0-py2-none-any.whl", hash = "sha256:de08f50a22955ddec353876df7b2545994d6df08a2f45d54ac8c05e530372ca0"},
+    {file = "typing_inspect-0.6.0-py3-none-any.whl", hash = "sha256:3b98390df4d999a28cf5b35d8b333425af5da2ece8a4ea9e98f71e7591347b4f"},
+    {file = "typing_inspect-0.6.0.tar.gz", hash = "sha256:8f1b1dd25908dbfd81d3bebc218011531e7ab614ba6e5bf7826d887c834afab7"},
 ]
 uritemplate = [
     {file = "uritemplate-3.0.1-py2.py3-none-any.whl", hash = "sha256:07620c3f3f8eed1f12600845892b0e036a2420acf513c53f7de0abd911a5894f"},
