@@ -663,7 +663,7 @@ description = "A library for property-based testing"
 name = "hypothesis"
 optional = false
 python-versions = ">=3.6"
-version = "5.36.1"
+version = "5.36.2"
 
 [package.dependencies]
 attrs = ">=19.2.0"
@@ -1042,7 +1042,7 @@ description = "A concrete syntax tree with AST-like properties for Python 3.5, 3
 name = "libcst"
 optional = false
 python-versions = ">=3.6"
-version = "0.3.11"
+version = "0.3.12"
 
 [package.dependencies]
 pyyaml = ">=5.2"
@@ -2831,8 +2831,8 @@ httplib2 = [
     {file = "httplib2-0.18.1.tar.gz", hash = "sha256:8af66c1c52c7ffe1aa5dc4bcd7c769885254b0756e6e69f953c7f0ab49a70ba3"},
 ]
 hypothesis = [
-    {file = "hypothesis-5.36.1-py3-none-any.whl", hash = "sha256:368b8f8363cbd186d4dddfcdb1eef46259ca5205f397a8de5979734b25ba5801"},
-    {file = "hypothesis-5.36.1.tar.gz", hash = "sha256:0a6af77ba1d111d39494f82569771bb24ce820484c4be43b204cd430ef7d1be2"},
+    {file = "hypothesis-5.36.2-py3-none-any.whl", hash = "sha256:6d67514a61dd595a129f589be1b44a68a70898e20712e49229150e8947b57da8"},
+    {file = "hypothesis-5.36.2.tar.gz", hash = "sha256:43a62bdbaa50cd3886e63571489e1af978e6c66274f8029ced194e19d7d66ebe"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -2938,8 +2938,8 @@ kiwisolver = [
     {file = "kiwisolver-1.2.0.tar.gz", hash = "sha256:247800260cd38160c362d211dcaf4ed0f7816afb5efe56544748b21d6ad6d17f"},
 ]
 libcst = [
-    {file = "libcst-0.3.11-py3-none-any.whl", hash = "sha256:15477d0b60a0da2929e0dc005b321e5113337dc16f4f42b26d8388955c5599b3"},
-    {file = "libcst-0.3.11.tar.gz", hash = "sha256:bbc9ef10f9d263f8a99f8a84ea0408b8d26b58236cb581016485e3658ffa1b24"},
+    {file = "libcst-0.3.12-py3-none-any.whl", hash = "sha256:f38f24917660a197683208a7086d78e23b3047b27bef8c795838b9d265858b10"},
+    {file = "libcst-0.3.12.tar.gz", hash = "sha256:a1837239a9a32bcd00c6241b093abc3213431c71c1e6f53da0928a0f57ebfcfd"},
 ]
 markdown = [
     {file = "Markdown-3.2.2-py3-none-any.whl", hash = "sha256:c467cd6233885534bf0fe96e62e3cf46cfc1605112356c4f9981512b8174de59"},
