@@ -1,7 +1,6 @@
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
-import pandas as pd
 import spacy
 from sklearn.preprocessing import MultiLabelBinarizer
 from spacy.matcher import PhraseMatcher
@@ -9,7 +8,7 @@ from tqdm import tqdm
 
 from deep_patient_cohorts.classifiers.age import AgeClassifier
 from deep_patient_cohorts.classifiers.sex import SexClassifier
-from deep_patient_cohorts.utils.common import reformat_icd_code
+from deep_patient_cohorts.common.utils import CHILDBIRTH_IDS, MENSTRUATION_AND_MENOPAUSE_IDS
 
 spacy.prefer_gpu()
 
@@ -22,42 +21,40 @@ ABSTAIN = 0
 class NoisyLabeler:
     def __init__(
         self,
-        descriptions: str,
-        whitelist: Optional[Iterable[str]] = None,
+        labels: List[str],
+        descriptions: Optional[Dict[str, str]] = None,
         spacy_model: str = "en_core_sci_sm",
     ) -> None:
-        self.nlp = spacy.load(spacy_model)
-        # Load the ICD code descriptions provided by MIMIC-III and obtained here:
-        # (https://physionet.org/content/mimiciii-demo/1.4/D_ICD_DIAGNOSES.csv)
-        # This file does not contain properly formatted ICD codes, so we reformat.
-        self._class_descriptions = (
-            pd.read_csv(descriptions, converters={"ICD9_CODE": reformat_icd_code})
-            .drop(["ROW_ID"], axis=1)
-            .set_index("ICD9_CODE")
-        )
-        # If a whitelist is provided, restrict ourselves to the intersection of codes.
-        self._class_labels = self._class_descriptions.index.tolist()
-        if whitelist is not None:
-            self._class_labels = list(set(self._class_labels) & set(whitelist))
+        self._labels = labels
+        self._descriptions = descriptions
+        self._nlp = spacy.load(spacy_model)
 
         self._classifiers = {
             "age": AgeClassifier(),
             "sex": SexClassifier(),
         }
-        self._lfs = [self._phrase_match, self._negate_childbirth]
+        self._lfs = [
+            self._phrase_match,
+            self._negate_childbirth,
+            self._negate_menstruation_and_menopause,
+        ]
 
     def __call__(self, texts: Union[str, List[str], Iterable[str]]) -> Dict[str, np.ndarray]:
 
         if isinstance(texts, str):
             texts = [texts]
+
+        sex = self._classifiers["sex"](texts)
+        age = self._classifiers["age"](texts)
+
         # For each ICD, we need to fill up an array of ( no. of documents X no. of lfs )
-        noisy_labels = {class_label: [] for class_label in self._class_labels}
-        for class_label, noisy_label in tqdm(noisy_labels.items()):
+        noisy_labels = {label: [] for label in self._labels}
+        for label, noisy_label in tqdm(noisy_labels.items()):
             for lf in self._lfs:
-                noisy_label.append(lf(class_label, texts))
+                noisy_label.append(lf(label, texts, sex=sex, age=age))
         noisy_labels = {
-            class_label: np.asarray(noisy_label, dtype=np.int8).T
-            for class_label, noisy_label in noisy_labels.items()
+            label: np.asarray(noisy_label, dtype=np.int8).T
+            for label, noisy_label in noisy_labels.items()
         }
         return noisy_labels
 
@@ -95,51 +92,30 @@ class NoisyLabeler:
 
         return accuracy, abstain_rate
 
-    def _phrase_match(self, class_label: str, texts: List[str]) -> List[int]:
-        # Get the long title, break it up into tokens.
-        # If any of the terms are in document, return POSITIVE, else return ABSTAIN.
-        descriptions = ",".join(
-            self._class_descriptions.loc[class_label, "SHORT_TITLE":"LONG_TITLE"].tolist()
-        ).split(",")
-        matcher = PhraseMatcher(self.nlp.tokenizer.vocab, attr="LOWER")
-        patterns = list(self.nlp.tokenizer.pipe(descriptions))
-        matcher.add(class_label, patterns)
-        docs = self.nlp.tokenizer.pipe(texts)
-        noisy_labels = list(POSITIVE if matcher(doc) else ABSTAIN for doc in docs)
+    def _phrase_match(self, label: str, texts: List[str], **kwargs) -> List[int]:
+        noisy_labels = [ABSTAIN] * len(texts)
+        description = self._descriptions.get(label)
+        if description:
+            matcher = PhraseMatcher(self._nlp.tokenizer.vocab, attr="LOWER")
+            patterns = list(self._nlp.tokenizer.pipe(description))
+            matcher.add(label, patterns)
+            docs = self._nlp.tokenizer.pipe(texts)
+            noisy_labels = list(POSITIVE if matcher(doc) else ABSTAIN for doc in docs)
         return noisy_labels
 
-    def _negate_childbirth(self, class_label: str, texts: List[str]) -> List[int]:
-        # Determine if the current ICD code is pregnancy related
-        descriptions = ",".join(
-            self._class_descriptions.loc[class_label, "SHORT_TITLE":"LONG_TITLE"].tolist()
-        ).split(",")
-        matcher = PhraseMatcher(self.nlp.tokenizer.vocab, attr="LOWER")
-        patterns = list(
-            self.nlp.tokenizer.pipe(
-                [
-                    "birth",
-                    "childbirth",
-                    "pregnant",
-                    "pregnancy",
-                    "gestation",
-                    "labor",
-                    "delivery",
-                    "complicating labor and delivery",
-                    "outcome of delivery",
-                ]
-            ),
-        )
-        matcher.add(class_label, patterns)
-        docs = self.nlp.tokenizer.pipe(descriptions)
-        pregnancy_icd_code = any(matcher(doc) for doc in docs)
-        # Use pre-trained classifier to determine sex and age
-        is_male = self._classifiers["sex"](texts)
-        ages = self._classifiers["age"](texts)
-        # If pregnancy related ICD code and patient is male or young, vote NEGATIVE, else ABSTAIN
-        if pregnancy_icd_code:
-            noisy_labels = [
-                NEGATIVE if male or age >= 75 else ABSTAIN for male, age in zip(is_male, ages)
-            ]
-        else:
-            noisy_labels = [ABSTAIN] * len(texts)
-        return noisy_labels
+    def _negate_childbirth(self, label: str, texts: List[str], **kwargs) -> List[str]:
+        noisy_labels = np.array([ABSTAIN] * len(texts))
+        if label in CHILDBIRTH_IDS:
+            sex = kwargs.get("sex")
+            age = kwargs.get("age")
+            noisy_labels[np.logical_or(sex == 0, np.logical_and(age >= 75, age != -1))] = NEGATIVE
+        return noisy_labels.tolist()
+
+    def _negate_menstruation_and_menopause(
+        self, label: str, texts: List[str], **kwargs
+    ) -> List[str]:
+        noisy_labels = np.array([ABSTAIN] * len(texts))
+        if label in MENSTRUATION_AND_MENOPAUSE_IDS:
+            sex = kwargs.get("sex")
+            noisy_labels[sex == 0] = NEGATIVE
+        return noisy_labels.tolist()
