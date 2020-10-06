@@ -10,7 +10,7 @@ repository = "https://github.com/semantic-health/deep-patient-cohorts"
 [tool.poetry.dependencies]
 python = "^3.6.1"
 typer = "^0.3.2"
-pandas = "^1.1.1"
+pandas = "^1.1.3"
 spacy = "^2.3.2"
 en-core-sci-sm = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_sm-0.2.5.tar.gz" }
 scispacy = "^0.2.5"
