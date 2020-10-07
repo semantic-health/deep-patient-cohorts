@@ -373,6 +373,7 @@ spacy = ">=2.3.0"
 reference = ""
 type = "url"
 url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_sm-0.2.5.tar.gz"
+
 [[package]]
 category = "dev"
 description = "Discover and load entry points from installed packages."
@@ -663,7 +664,7 @@ description = "A library for property-based testing"
 name = "hypothesis"
 optional = false
 python-versions = ">=3.6"
-version = "5.37.0"
+version = "5.37.1"
 
 [package.dependencies]
 attrs = ">=19.2.0"
@@ -1029,6 +1030,7 @@ tests = ["pytest", "flake8", "mock", "portpicker", "pytest-xdist", "pytest-cov"]
 reference = "8f0d4550417af1676143499c688434065eb807c9"
 type = "git"
 url = "https://github.com/keras-team/keras-tuner.git"
+
 [[package]]
 category = "main"
 description = "A fast implementation of the Cassowary constraint solver"
@@ -2384,7 +2386,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "443b01eef300a9a950c1610a695ffbbc7931c5c9fae3795ac247403c3f3a7b44"
+content-hash = "6dc6490e465c2183ddfe849e805d2f41c5269385f8c3e9033bef125684156c57"
 lock-version = "1.0"
 python-versions = "^3.6.1"
 
@@ -2832,8 +2834,8 @@ httplib2 = [
     {file = "httplib2-0.18.1.tar.gz", hash = "sha256:8af66c1c52c7ffe1aa5dc4bcd7c769885254b0756e6e69f953c7f0ab49a70ba3"},
 ]
 hypothesis = [
-    {file = "hypothesis-5.37.0-py3-none-any.whl", hash = "sha256:180507e78a4f52b1c470164d1a03b74b0032e473a98cc2933e85e72aee40c6a1"},
-    {file = "hypothesis-5.37.0.tar.gz", hash = "sha256:b3a6ae80e8661b6cab0a722cc437d26274d5e3d0759ef2f6a6a1c3b066dd3185"},
+    {file = "hypothesis-5.37.1-py3-none-any.whl", hash = "sha256:4c6c69cd02be7053361dceefee95983a1d9aa6e388061d17a4ed486f8c60bce0"},
+    {file = "hypothesis-5.37.1.tar.gz", hash = "sha256:9b524052b0c5ed584d8c3a1c21a5b5d6333378a8b20b652792af762827401681"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -3443,6 +3445,12 @@ regex = [
     {file = "regex-2020.9.27-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:8d69cef61fa50c8133382e61fd97439de1ae623fe943578e477e76a9d9471637"},
     {file = "regex-2020.9.27-cp38-cp38-win32.whl", hash = "sha256:f2388013e68e750eaa16ccbea62d4130180c26abb1d8e5d584b9baf69672b30f"},
     {file = "regex-2020.9.27-cp38-cp38-win_amd64.whl", hash = "sha256:4318d56bccfe7d43e5addb272406ade7a2274da4b70eb15922a071c58ab0108c"},
+    {file = "regex-2020.9.27-cp39-cp39-manylinux1_i686.whl", hash = "sha256:84cada8effefe9a9f53f9b0d2ba9b7b6f5edf8d2155f9fdbe34616e06ececf81"},
+    {file = "regex-2020.9.27-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:816064fc915796ea1f26966163f6845de5af78923dfcecf6551e095f00983650"},
+    {file = "regex-2020.9.27-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:5d892a4f1c999834eaa3c32bc9e8b976c5825116cde553928c4c8e7e48ebda67"},
+    {file = "regex-2020.9.27-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:c9443124c67b1515e4fe0bb0aa18df640965e1030f468a2a5dc2589b26d130ad"},
+    {file = "regex-2020.9.27-cp39-cp39-win32.whl", hash = "sha256:49f23ebd5ac073765ecbcf046edc10d63dcab2f4ae2bce160982cb30df0c0302"},
+    {file = "regex-2020.9.27-cp39-cp39-win_amd64.whl", hash = "sha256:3d20024a70b97b4f9546696cbf2fd30bae5f42229fbddf8661261b1eaff0deb7"},
     {file = "regex-2020.9.27.tar.gz", hash = "sha256:a6f32aea4260dfe0e55dc9733ea162ea38f0ea86aa7d0f77b15beac5bf7b369d"},
 ]
 requests = [
