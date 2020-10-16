@@ -4,15 +4,9 @@
 
 # Deep Patient Cohorts
 
-A tool for automatic ICD code labelling of clincal notes.
+A tool for automatically labelling discharge summaries into disease categories.
 
 ## Installation
-
-Latest PyPI release
-
-```bash
-pip install deep-patient-cohorts
-```
 
 From source
 
@@ -27,3 +21,7 @@ cd deep-patient-cohorts
 # Install the package with poetry
 poetry install
 ```
+
+## Usage
+
+See the notebook [getting_started.ipynb](notebooks/getting_started.ipynb).
