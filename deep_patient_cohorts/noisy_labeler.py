@@ -1,9 +1,11 @@
+import re
 from typing import Callable, Iterable, List, Union
 
 import numpy as np
 import spacy
 from scispacy.abbreviation import AbbreviationDetector
 from scispacy.linking import EntityLinker
+from spacy.tokens import Doc
 from tqdm import tqdm
 
 from deep_patient_cohorts.common.utils import ABSTAIN, NEGATIVE, POSITIVE
@@ -16,27 +18,30 @@ class NoisyLabeler:
         self,
         spacy_model: str = "en_core_sci_md",
     ) -> None:
-        # Setup ScispaCy with the UMLS linking pipe.
-        nlp = spacy.load(spacy_model)
+        # Setup ScispaCy with the UMLS linking and Sectionizer pipes.
+        nlp = spacy.load(spacy_model, disable=["tagger", "parser"])
         nlp.add_pipe(AbbreviationDetector(nlp))
         nlp.add_pipe(EntityLinker(resolve_abbreviations=True, name="umls"))
         self._nlp = nlp
 
-        self.lfs = [
-            self._chest_pain,
-        ]
+        self.lfs = [self._chest_pain, self._ejection_fraction]
 
     def add(self, lf: Callable) -> None:
         # Bind lf to self before appending
         self.lfs.append(lf.__get__(self))
 
-    def __call__(self, texts: Union[str, List[str], Iterable[str]]) -> np.ndarray:
+    def preprocess(self, texts: Union[str, List[str], Iterable[str]]) -> List[Doc]:
+        return [doc for doc in tqdm(self._nlp.pipe(texts))]
+
+    def __call__(self, texts: Union[str, Iterable[Union[str, Doc]]]) -> np.ndarray:
         """Return an array, where the rows represent each text in `texts` and the columns contain
-        the noisy labels produced by the labelling functions (LFs) in `self._lfs`."""
+        the noisy labels produced by the labelling functions (LFs) in `self.lfs`."""
         if not self.lfs:
             raise ValueError("At least one labelling function must be provided. self.lfs is empty.")
         if isinstance(texts, str):
             texts = [texts]
+        if not isinstance(texts[0], Doc):
+            texts = self.preprocess(texts)
 
         noisy_labels = []
         for lf in tqdm(self.lfs):
@@ -61,5 +66,15 @@ class NoisyLabeler:
                 f"LF {i}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
             )
 
-    def _chest_pain(self, texts: List[str]) -> List[int]:
-        return [POSITIVE if "chest pain" in text.lower() else ABSTAIN for text in texts]
+    def _chest_pain(self, texts: Iterable[Doc]) -> List[int]:
+        return [POSITIVE if "chest pain" in text.text.lower() else ABSTAIN for text in texts]
+
+    def _ejection_fraction(self, texts: Iterable[Doc]) -> List[int]:
+        """Votes `POSITIVE` if a low ejection fraction is mentioned. Otherwise votes ABSTAIN."""
+        upper_bound = 35  # ejection fractions under which to vote POSITIVE, exclusively.
+        pattern = re.compile(r"(ejection fraction|L?V?EF)[\s\w:<>=]+(\d\d)[\d-]*%", re.IGNORECASE)
+        matches = [pattern.findall(text.text) for text in texts]
+        return [
+            ABSTAIN if not match else POSITIVE if int(match[-1][-1]) < upper_bound else ABSTAIN
+            for match in matches
+        ]
