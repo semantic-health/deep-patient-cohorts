@@ -3,8 +3,6 @@ from typing import Callable, Iterable, List, Union
 
 import numpy as np
 import spacy
-from scispacy.abbreviation import AbbreviationDetector
-from scispacy.linking import EntityLinker
 from spacy.tokens import Doc
 from tqdm import tqdm
 
@@ -20,8 +18,6 @@ class NoisyLabeler:
     ) -> None:
         # Setup ScispaCy with the UMLS linking and Sectionizer pipes.
         nlp = spacy.load(spacy_model, disable=["tagger", "parser"])
-        nlp.add_pipe(AbbreviationDetector(nlp))
-        nlp.add_pipe(EntityLinker(resolve_abbreviations=True, name="umls"))
         self._nlp = nlp
 
         self.lfs = [self._chest_pain, self._ejection_fraction]
@@ -70,9 +66,12 @@ class NoisyLabeler:
         return [POSITIVE if "chest pain" in text.text.lower() else ABSTAIN for text in texts]
 
     def _ejection_fraction(self, texts: Iterable[Doc]) -> List[int]:
-        """Votes `POSITIVE` if a low ejection fraction is mentioned. Otherwise votes ABSTAIN."""
+        """Votes `POSITIVE` if a low ejection fraction is mentioned. Otherwise votes ABSTAIN.
+        
+        regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
+        """
         upper_bound = 35  # ejection fractions under which to vote POSITIVE, exclusively.
-        pattern = re.compile(r"(ejection fraction|L?V?EF)[\s\w:<>=]+(\d\d)[\d-]*%", re.IGNORECASE)
+        pattern = re.compile(r"(ejection fraction|L?V?EF)[\s\w:<>=]+(\d\d)[\d-]*%?", re.IGNORECASE)
         matches = [pattern.findall(text.text) for text in texts]
         return [
             ABSTAIN if not match else POSITIVE if int(match[-1][-1]) < upper_bound else ABSTAIN
