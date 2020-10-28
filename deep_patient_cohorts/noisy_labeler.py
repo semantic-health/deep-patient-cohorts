@@ -14,7 +14,7 @@ spacy.prefer_gpu()
 class NoisyLabeler:
     def __init__(
         self,
-        spacy_model: str = "en_core_sci_md",
+        spacy_model: str = "en_ner_bc5cdr_md",
     ) -> None:
         # Setup ScispaCy with the UMLS linking and Sectionizer pipes.
         nlp = spacy.load(spacy_model, disable=["tagger", "parser"])
