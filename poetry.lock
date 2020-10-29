@@ -236,19 +236,19 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "en-core-sci-md"
-version = "0.2.5"
+name = "en-ner-bc5cdr-md"
+version = "0.3.0"
 description = "Spacy Models for Biomedical Text."
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-spacy = ">=2.3.0"
+spacy = ">=2.3.1"
 
 [package.source]
 type = "url"
-url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz"
+url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.3.0/en_ner_bc5cdr_md-0.3.0.tar.gz"
 [[package]]
 name = "entrypoints"
 version = "0.3"
@@ -1421,7 +1421,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.0"
-content-hash = "4b9e615cd6368975fda9d2ecf4369643410f600d56609c647a7f70714e95287b"
+content-hash = "c14469178fc6a86f80b603ab2fc9fa6e6eda0a26537fdc279f777fb141ecbea8"
 
 [metadata.files]
 appdirs = [
@@ -1619,7 +1619,7 @@ defusedxml = [
     {file = "defusedxml-0.6.0-py2.py3-none-any.whl", hash = "sha256:6687150770438374ab581bb7a1b327a847dd9c5749e396102de3fad4e8a3ef93"},
     {file = "defusedxml-0.6.0.tar.gz", hash = "sha256:f684034d135af4c6cbb949b8a4d2ed61634515257a67299e5f940fbaa34377f5"},
 ]
-en-core-sci-md = []
+en-ner-bc5cdr-md = []
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
