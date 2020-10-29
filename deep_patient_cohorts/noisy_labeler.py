@@ -20,7 +20,9 @@ class NoisyLabeler:
         nlp = spacy.load(spacy_model, disable=["tagger", "parser"])
         self._nlp = nlp
 
-        self.lfs = [self._chest_pain, self._ejection_fraction]
+        self.lfs = [self._chest_pain, self._ejection_fraction, self._heart_disease, self._st_elevation,
+                   self._atherosclerosis,self._heart_failure, self._angina, self._abnormal_diagnostic_test,
+                   self._correlated_procedures, self._common_heart_failure]
 
     def add(self, lf: Callable) -> None:
         # Bind lf to self before appending
@@ -77,3 +79,64 @@ class NoisyLabeler:
             ABSTAIN if not match else POSITIVE if int(match[-1][-1]) < upper_bound else ABSTAIN
             for match in matches
         ]
+
+        # heart_disease
+    def _heart_disease(self, texts: List[str]) -> List[int]:
+        return [POSITIVE if "heart disease" in text.text.lower() else ABSTAIN for text in texts]
+
+
+    # st elevation LF
+    def _st_elevation(self, texts: List[str]) -> List[int]:
+        search_list = ["stemi", "st elevation", "st elevation mi"]
+        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
+
+    # atherosclerosis
+    def _atherosclerosis(self, texts: List[str]) -> List[int]:
+        search_list = ["atherosclerosis", "arteriosclerosis", "atherosclerotic", "arterial sclerosis", "artherosclerosis", "atherosclerotic disease"]
+        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
+    '''
+    # heart_attack -- This labelling function is gives 0% accuracy thats why I commented it out
+
+    def heart_attack(self, texts: List[str]) -> List[int]:
+        search_list = ["myocardial infarcation", "mi", "ischemic heart disease", "cardiac arrest", "coronary infarction", "asystole", "cardiopulmonary arrest", "coronary thrombosis", "heart arrest", "heart attack", "heart stoppage"]
+        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
+    '''
+    # heart_failure
+    def _heart_failure(self, texts: List[str]) -> List[int]:
+        search_list = ["congestive heart failure", "decomensated heart failure", "chf", "left-side heart failure", "right-sided heart failure"]
+        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
+
+
+    # angina LF
+
+    def _angina(self, texts: List[str]) -> List[int]:
+        search_list_1 = ["stable", "unstable",  "variant"]
+        search_list_2 = ["angina", "chest_pain", "angina pectoris"]
+
+        return [POSITIVE if (any([x in text.text.lower() for x in search_list_1])) and (any([x in text.text.lower() for x in search_list_2]))  else ABSTAIN for text in texts]
+
+
+    # abnormal diagnostic tests results LF
+    def _abnormal_diagnostic_test(self, texts: List[str]) -> List[int]:
+        search_list_1 = ["abnormal", "concerning"]
+        search_list_2 = ["ecg", "echo", "echocarrdiogram"]
+
+        return [POSITIVE if (any([x in text.text.lower() for x in search_list_1])) and (any([x in text.text.lower() for x in search_list_2]))  else ABSTAIN for text in texts]
+
+    # corelated procedures LF
+    def _correlated_procedures(self, texts:List[str]) -> List[int]:
+        search_list = ["coronary", "cardiac cath", "cardiac stent", "catheter", "catheterization", "stenting", "angioplasty",
+                      "percutaneous coronary intervention","pci"]
+
+        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
+
+    #Common symptom of heart failure
+
+    def _common_heart_failure(self, texts:List[str]) -> List[int]:
+        pattern = re.compile(r"(swelling|edema|puffiness)[\s\w:<>=]+(in)?[\s\w:<>=]+(left|right|l|r)?[\s\w:<>=]+(ankle|leg|feet|foot|ankles|legs)", re.IGNORECASE)
+        matches = [pattern.findall(text.text) for text in texts]
+        #print(matches)
+        return [ABSTAIN if not match else POSITIVE for match in matches]
+
+
+
