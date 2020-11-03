@@ -79,7 +79,7 @@ class NoisyLabeler:
     def _ejection_fraction(self, texts: Iterable[Doc]) -> List[int]:
         """Votes `POSITIVE` if a low ejection fraction is mentioned. Otherwise votes ABSTAIN.
 
-        regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
+        Regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
         """
         upper_bound = 35  # ejection fractions under which to vote POSITIVE, exclusively.
         pattern = re.compile(r"(ejection fraction|L?V?EF)[\s\w:<>=]+(\d\d)[\d-]*%?", re.IGNORECASE)
@@ -117,13 +117,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    """
-    # heart_attack -- This labelling function is gives 0% accuracy thats why I commented it out
-
-    def heart_attack(self, texts: List[str]) -> List[int]:
-        search_list = ["myocardial infarcation", "mi", "ischemic heart disease", "cardiac arrest", "coronary infarction", "asystole", "cardiopulmonary arrest", "coronary thrombosis", "heart arrest", "heart attack", "heart stoppage"]
-        return [POSITIVE if any([x in text.text.lower() for x in search_list]) else ABSTAIN for text in texts]
-    """
     # heart_failure
     def _heart_failure(self, texts: List[str]) -> List[int]:
         search_list = [
