@@ -5,8 +5,15 @@ import numpy as np
 import spacy
 from spacy.tokens import Doc
 from tqdm import tqdm
+from functools import partial
 
-from deep_patient_cohorts.common.utils import ABSTAIN, NEGATIVE, POSITIVE
+from deep_patient_cohorts.common.utils import (
+    ABSTAIN,
+    NEGATIVE,
+    POSITIVE,
+    HEART_DISEASES,
+    CARDIAC_DRUGS,
+)
 
 spacy.prefer_gpu()
 
@@ -21,9 +28,14 @@ class NoisyLabeler:
         self._nlp = nlp
 
         self.lfs = [
-            self._chest_pain,
             self._ejection_fraction,
-            self._heart_disease,
+            partial(self._exact_term_match, terms=HEART_DISEASES, threshold=2),
+            partial(
+                self._exact_term_match,
+                terms=CARDIAC_DRUGS,
+                threshold=1,
+                negative_if_none=False,
+            ),
             self._st_elevation,
             self._atherosclerosis,
             self._heart_failure,
@@ -70,14 +82,11 @@ class NoisyLabeler:
             abstain_rate = np.sum(noisy_labels[:, i] == ABSTAIN) / gold_labels.shape[0]
 
             print(
-                f"LF {i}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
+                f"LF {i+1}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
             )
 
-    def _chest_pain(self, texts: Iterable[Doc]) -> List[int]:
-        return [POSITIVE if "chest pain" in text.text.lower() else ABSTAIN for text in texts]
-
     def _ejection_fraction(self, texts: Iterable[Doc]) -> List[int]:
-        """Votes `POSITIVE` if a low ejection fraction is mentioned. Otherwise votes ABSTAIN.
+        """Votes POSITIVE if a low ejection fraction is mentioned. Otherwise votes ABSTAIN.
 
         Regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
         """
@@ -89,12 +98,29 @@ class NoisyLabeler:
             for match in matches
         ]
 
-        # heart_disease
+    def _exact_term_match(
+        self,
+        texts: Iterable[Doc],
+        terms: Iterable[str],
+        threshold: int = 1,
+        negative_if_none: bool = True,
+    ):
+        """Votes POSITIVE if there are `mention_threshold` number of instances of `terms` for each `Doc`
+        in `texts`. If `negative_if_none`, votes NEGATIVE if there are no matches. Otherwise votes
+        ABSTAIN.
+        """
 
-    def _heart_disease(self, texts: List[str]) -> List[int]:
-        return [POSITIVE if "heart disease" in text.text.lower() else ABSTAIN for text in texts]
+        noisy_labels = []
+        for text in texts:
+            num_mentions = len(re.findall(r"|".join(terms), text.text, re.IGNORECASE))
+            if num_mentions == 0 and negative_if_none:
+                noisy_labels.append(NEGATIVE)
+            elif num_mentions >= mention_threshold:
+                noisy_labels.append(POSITIVE)
+            else:
+                noisy_labels.append(ABSTAIN)
+        return noisy_labels
 
-    # st elevation LF
     def _st_elevation(self, texts: List[str]) -> List[int]:
         search_list = ["stemi", "st elevation", "st elevation mi"]
         return [
@@ -102,7 +128,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # atherosclerosis
     def _atherosclerosis(self, texts: List[str]) -> List[int]:
         search_list = [
             "atherosclerosis",
@@ -117,7 +142,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # heart_failure
     def _heart_failure(self, texts: List[str]) -> List[int]:
         search_list = [
             "congestive heart failure",
@@ -131,8 +155,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # angina LF
-
     def _angina(self, texts: List[str]) -> List[int]:
         search_list_1 = ["stable", "unstable", "variant"]
         search_list_2 = ["angina", "chest_pain", "angina pectoris"]
@@ -145,7 +167,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # abnormal diagnostic tests results LF
     def _abnormal_diagnostic_test(self, texts: List[str]) -> List[int]:
         search_list_1 = ["abnormal", "concerning"]
         search_list_2 = ["ecg", "echo", "echocarrdiogram"]
@@ -158,7 +179,6 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # corelated procedures LF
     def _correlated_procedures(self, texts: List[str]) -> List[int]:
         search_list = [
             "coronary",
@@ -177,13 +197,13 @@ class NoisyLabeler:
             for text in texts
         ]
 
-    # Common symptom of heart failure
-
     def _common_heart_failure(self, texts: List[str]) -> List[int]:
         pattern = re.compile(
-            r"(swelling|edema|puffiness)[\s\w:<>=]+(in)?[\s\w:<>=]+(left|right|l|r)?[\s\w:<>=]+(ankle|leg|feet|foot|ankles|legs)",
+            (
+                r"(swelling|edema|puffiness)[\s\w:<>=]+(in)?[\s\w:<>=]+(left|right|l|r)?[\s\w:<>=]"
+                r"+(ankle|leg|feet|foot|ankles|legs)"
+            ),
             re.IGNORECASE,
         )
         matches = [pattern.findall(text.text) for text in texts]
-        # print(matches)
         return [ABSTAIN if not match else POSITIVE for match in matches]
