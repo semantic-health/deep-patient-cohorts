@@ -10,7 +10,7 @@ ABSTAIN = 0
 IS_A_CID = "116680003"
 
 # The textual descriptions of every child of the Snowmed Concept "Heart Diseases" (56265001)
-HEART_DISEASES = [
+HEART_DISEASES = {
     "Acute heart disease",
     "Heart valve disorder",
     "Valvular heart disease",
@@ -214,10 +214,10 @@ HEART_DISEASES = [
     "Wild-type transthyretin cardiac amyloidosis",
     "Disorder of cardiac atrium",
     "Atrial cardiopathy",
-]
+}
 
 # The textual descriptions of every child of the Snowmed Concept "Cardiovascular Agents" (373247007)
-CARDIAC_DRUGS = [
+CARDIAC_DRUGS = {
     "Capillary active drug",
     "Capillary protectant",
     "Vasoprotectant",
@@ -260,7 +260,7 @@ CARDIAC_DRUGS = [
     "3-methoxy-o-desmethylencainide",
     "Modecainide",
     "Vasopressor",
-]
+}
 
 
 def reformat_icd_code(icd_code: str, is_diag: bool = True) -> str:
