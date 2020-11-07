@@ -79,7 +79,7 @@ class NoisyLabeler:
             abstain_rate = np.sum(noisy_labels[:, i] == ABSTAIN) / gold_labels.shape[0]
 
             print(
-                f"LF {i+1}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
+                f"LF {i}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
             )
 
     def fit_lfs(self, texts: Union[str, List[Union[str, Doc]]]) -> np.ndarray:
@@ -152,9 +152,9 @@ class NoisyLabeler:
         negative_if_none: bool = False,
         entity_class: str = None,
     ):
-        """Votes POSITIVE if there are `mention_threshold` number of instances of `terms` for each `Doc`
-        in `texts`. If `negative_if_none`, votes NEGATIVE if there are no matches. Otherwise votes
-        ABSTAIN.
+        """Votes POSITIVE if there are `mention_threshold` number of instances of `terms` for each
+        `Doc` in `texts`. If `negative_if_none`, votes NEGATIVE if there are no matches. Otherwise
+        votes ABSTAIN.
         """
         terms = [term.lower() if ignore_case else term for term in terms]
         noisy_labels = []
