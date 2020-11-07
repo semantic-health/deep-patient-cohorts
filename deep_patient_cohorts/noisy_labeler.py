@@ -154,7 +154,8 @@ class NoisyLabeler:
     ):
         """Votes POSITIVE if there are `mention_threshold` number of instances of `terms` for each
         `Doc` in `texts`. If `negative_if_none`, votes NEGATIVE if there are no matches. Otherwise
-        votes ABSTAIN.
+        votes ABSTAIN. To match on named entities identified by `spacy_model`, provide the class
+        name with `entity_class`.
         """
         terms = [term.lower() if ignore_case else term for term in terms]
         noisy_labels = []
