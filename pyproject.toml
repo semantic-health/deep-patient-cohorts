@@ -6,6 +6,7 @@ authors = ["johngiorgi <johnmgiorgi@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/semantic-health/deep-patient-cohorts"
+include = ["common/term_lists/*.txt"]
 
 [tool.poetry.dependencies]
 python = "^3.7.0"
@@ -29,6 +30,7 @@ coverage = "^5.2.1"
 codecov = "^2.1.8"
 mypy = "^0.790"
 
+# This configuration is borrowed from: https://github.com/allenai/allennlp/blob/main/pyproject.toml
 [tool.black]
 line-length = 100
 
@@ -50,5 +52,5 @@ exclude = '''
 '''
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
