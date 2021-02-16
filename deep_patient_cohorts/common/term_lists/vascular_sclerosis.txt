@@ -1,0 +1,42 @@
+Segmental glomerulosclerosis
+Arteriolosclerosis
+Phlebosclerosis
+Venofibrosis
+Venosclerosis
+Elastic vascular sclerosis
+Atherosclerotic fibrous plaque
+Arteriosclerosis
+Calcified atheromatous plaque
+Arteriolosclerosis with fibrinoid necrosis
+Vascular wall degeneration
+Atherosclerosis
+Atheromatosis
+Nodular glomerulosclerosis
+Cystic medial necrosis
+Cystic medionecrosis
+Adventitial degeneration
+Atheroma
+Atheromatous plaque
+Atheromatous degeneration
+Fatty streaks
+Lipid streaks
+Yellow streaks
+Yellow dots
+Fatty dots
+Ulcerated atheromatous plaque
+Fibroelastosis
+Complicated atheromatous plaque
+Intercapillary glomerulosclerosis
+Glomerulosclerosis
+Medial degeneration
+Medial calcification
+Angiolithic degeneration
+Vascular sclerosis
+Hemorrhagic atheromatous plaque
+Focal fibroelastosis
+Diffuse fibroelastosis
+Calcified atheroma
+Ulcerated atheroma
+Complicated atheroma
+Haemorrhagic atheromatous plaque
+Diffuse glomerulosclerosis

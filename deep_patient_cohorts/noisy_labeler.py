@@ -1,21 +1,22 @@
+import itertools
 import re
-from typing import Callable, Iterable, List, Union
+from functools import partial
+from itertools import chain
+from typing import Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 import spacy
+from flyingsquid.label_model import LabelModel
 from spacy.tokens import Doc
 from tqdm import tqdm
-import itertools
-from itertools import chain
-from flyingsquid.label_model import LabelModel
-from functools import partial
 
 from deep_patient_cohorts.common.utils import (
     ABSTAIN,
+    CARDIAC_DRUGS,
+    CARDIAC_PROCEDURES,
+    HEART_DISEASES,
     NEGATIVE,
     POSITIVE,
-    HEART_DISEASES,
-    CARDIAC_DRUGS,
     VASCULAR_SCLEROSIS,
 )
 
@@ -29,23 +30,28 @@ class NoisyLabeler:
         self._nlp = nlp
 
         self.lfs = [
-            self._ejection_fraction,
+            partial(self._exact_term_match, terms=HEART_DISEASES, threshold=6),
+            partial(self._exact_term_match, terms=CARDIAC_DRUGS, threshold=8),
             partial(
                 self._exact_term_match,
-                terms=HEART_DISEASES,
+                terms=VASCULAR_SCLEROSIS,
                 threshold=2,
-                negative_if_none=True,
+                negative_if_none=False,
             ),
-            partial(
-                self._exact_term_match,
-                terms=CARDIAC_DRUGS,
-                threshold=1,
-            ),
-            partial(self._exact_term_match, terms=VASCULAR_SCLEROSIS, threshold=3),
+            partial(self._exact_term_match, terms=CARDIAC_PROCEDURES, threshold=3),
+            self._ejection_fraction,
             self._st_elevation,
             self._heart_failure,
             self._abnormal_diagnostic_test,
             self._correlated_procedures,
+        ]
+        self.lfs = [
+            partial(
+                self._exact_term_match,
+                terms=CARDIAC_PROCEDURES,
+                threshold=2,
+                negative_if_none=False,
+            )
         ]
         self.label_model: LabelModel = None
 
@@ -55,32 +61,6 @@ class NoisyLabeler:
 
     def preprocess(self, texts: Union[str, Iterable[Doc], Iterable[str]]) -> List[Doc]:
         return [doc for doc in tqdm(self._nlp.pipe(texts))]
-
-    def fit(self, texts: Union[str, List[Union[str, Doc]]], gold_labels: np.ndarray) -> np.ndarray:
-        """Return an array, where the rows represent each text in `texts` and the columns contain
-        the noisy labels produced by the labelling functions (LFs) in `self.lfs`.
-        """
-        noisy_labels = self.fit_lfs(texts)
-        self.fit_lm(noisy_labels, gold_labels)
-        return self.label_model.predict(noisy_labels).reshape(gold_labels.shape)
-
-    @staticmethod
-    def accuracy(noisy_labels: np.ndarray, gold_labels: np.ndarray) -> None:
-        """Print the accuracy and abstain rate of each labelling function in `noisy_labels`,
-        based on the given `gold_labels`."""
-        m = noisy_labels.shape[1]
-
-        for i in range(m):
-            num_predictions = np.sum(noisy_labels[:, i] != ABSTAIN)
-            if num_predictions != 0:
-                accuracy = np.sum(noisy_labels[:, i] == gold_labels) / num_predictions
-            else:
-                accuracy = 1
-            abstain_rate = np.sum(noisy_labels[:, i] == ABSTAIN) / gold_labels.shape[0]
-
-            print(
-                f"LF {i}: Accuracy {int(accuracy * 100)}%, Abstain rate {int((abstain_rate) * 100)}%"
-            )
 
     def fit_lfs(self, texts: Union[str, List[Union[str, Doc]]]) -> np.ndarray:
         """Return an array, where the rows represent each text in `texts` and the columns contain
@@ -127,21 +107,56 @@ class NoisyLabeler:
         )
         self.label_model = best_label_model
 
-    def _ejection_fraction(self, texts: Iterable[Doc]) -> List[int]:
-        """Votes POSITIVE if a low ejection fraction is mentioned. Otherwise votes ABSTAIN.
-
-        Regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
+    def fit(self, texts: Union[str, List[Union[str, Doc]]], gold_labels: np.ndarray) -> None:
+        """Return an array, where the rows represent each text in `texts` and the columns contain
+        the noisy labels produced by the labelling functions (LFs) in `self.lfs`.
         """
-        upper_bound = 35  # ejection fractions under which to vote POSITIVE, exclusively.
-        pattern = re.compile(
-            r"(?:ejection fraction|LVEF)[\s<>=:]+[\sa-zA-Z]*(\d\d)\D",
-            re.IGNORECASE,
-        )
-        matches = [pattern.findall(text.text) for text in texts]
+        noisy_labels = self.fit_lfs(texts)
+        self.fit_lm(noisy_labels, gold_labels)
 
-        return [
-            POSITIVE if match and int(match[-1]) < upper_bound else ABSTAIN for match in matches
-        ]
+    def predict(self, texts: Union[str, List[Union[str, Doc]]]) -> np.ndarray:
+        """Given some `texts`, returns the noisy labels produced by `self.label_model` as an array."""
+        if self.label_model is None:
+            raise ValueError(
+                "self.label_model is None. You must first call self.fit_lm or self.fit"
+            )
+        noisy_labels = self.fit_lfs(texts)
+        return self.label_model.predict(noisy_labels)
+
+    @staticmethod
+    def accuracy(
+        noisy_labels: np.ndarray, gold_labels: np.ndarray
+    ) -> Tuple[List[float], List[float]]:
+        """Returns a tuple of lists containing the accuracy and abstain rate of each labelling
+        function in `noisy_labels`, based on the given `gold_labels`."""
+        if len(noisy_labels.shape) != 2:
+            raise ValueError(
+                "Expected noisy_labels to be a 2-dimensional array."
+                f" Got a {len(noisy_labels.shape)}-dimension array."
+            )
+        if len(gold_labels.shape) > 2:
+            raise ValueError(
+                "Expected gold_labels to be a 1-dimensional array."
+                f" Got a {len(gold_labels.shape)}-dimension array."
+            )
+
+        m = noisy_labels.shape[1]
+        gold_labels = gold_labels.squeeze(-1) if len(gold_labels.shape) == 2 else gold_labels
+
+        accuracy, abstain_rate = [], []
+
+        for i in range(m):
+            num_predictions = np.sum(noisy_labels[:, i] != ABSTAIN)
+            if num_predictions != 0:
+                accuracy.append(np.sum(noisy_labels[:, i] == gold_labels) / num_predictions)
+            else:
+                accuracy.append(1)
+            abstain_rate.append(np.sum(noisy_labels[:, i] == ABSTAIN) / gold_labels.shape[0])
+
+            print(
+                f"LF {i}: Accuracy {int(accuracy[-1] * 100)}%, Abstain rate {int((abstain_rate[-1]) * 100)}%"
+            )
+        return accuracy, abstain_rate
 
     def _exact_term_match(
         self,
@@ -149,7 +164,7 @@ class NoisyLabeler:
         terms: Iterable[str],
         ignore_case: bool = True,
         threshold: int = 1,
-        negative_if_none: bool = False,
+        negative_if_none: bool = True,
         entity_class: str = None,
     ):
         """Votes POSITIVE if there are `mention_threshold` number of instances of `terms` for each
@@ -178,6 +193,20 @@ class NoisyLabeler:
             else:
                 noisy_labels.append(ABSTAIN)
         return noisy_labels
+
+    def _ejection_fraction(self, texts: Iterable[Doc], threshold: float = 30) -> List[int]:
+        """Votes POSITIVE if an ejection fraction equal to or less than `threshold` is mentioned.
+        Otherwise votes ABSTAIN.
+
+        Regex unit tests can be found here: https://regex101.com/r/mCw0b6/1
+        """
+        pattern = re.compile(
+            r"(?:ejection fraction|LVEF)[\s<>=:]+[\sa-zA-Z]*(\d\d)\D",
+            re.IGNORECASE,
+        )
+        matches = [pattern.findall(text.text) for text in texts]
+
+        return [POSITIVE if match and int(match[-1]) <= threshold else ABSTAIN for match in matches]
 
     def _st_elevation(self, texts: Iterable[Doc]) -> List[int]:
         search_list = ["stemi", "st elevation", "st elevation mi"]
