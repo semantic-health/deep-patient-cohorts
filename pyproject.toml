@@ -27,7 +27,7 @@ hypothesis = "^5.23.7"
 pytest = "^6.0.0"
 pytest-cov = "^2.10.0"
 coverage = "^5.2.1"
-codecov = "^2.1.8"
+codecov = "^2.1.12"
 mypy = "^0.790"
 
 # This configuration is borrowed from: https://github.com/allenai/allennlp/blob/main/pyproject.toml
