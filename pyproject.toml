@@ -17,7 +17,7 @@ scispacy = "^0.3.0"
 flyingsquid = "^0.0.0-alpha.0"
 pgmpy = "^0.1.12"
 clinical-sectionizer = "^0.1.3"
-jupyterlab = "^2.2.8"
+jupyterlab = "^3.4.0"
 en-ner-bc5cdr-md = {url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.3.0/en_ner_bc5cdr_md-0.3.0.tar.gz"}
 
 [tool.poetry.dev-dependencies]
